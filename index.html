@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang=en>
+<meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<title>totp</title>
+<style>
+  :root { color-scheme: light dark }
+  :root[data-theme=light] { color-scheme: light }
+  :root[data-theme=dark] { color-scheme: dark }
+  body { max-width: 34rem; margin: 3rem auto; padding: 0 1rem; font: 1rem/1.6 system-ui, sans-serif }
+  textarea { width: 100%; box-sizing: border-box; font-family: monospace }
+  progress { width: 100%; height: .5rem }
+  table { width: 100%; border-collapse: collapse }
+  td { padding: .25rem .5rem; vertical-align: baseline }
+  .code { font: 1.5rem monospace; text-align: right; letter-spacing: .08em }
+  #theme { position: fixed; top: 1rem; right: 1rem; border: 0; background: none; font-size: 1.5rem; line-height: 1; cursor: pointer }
+</style>
+<button id=theme title="theme: auto / light / dark">&#9680;</button>
+<h1>totp</h1>
+<p>One secret per line: <code>label: BASE32SECRET</code>, a bare secret, or an <code>otpauth://</code> URI. Everything stays in this browser.</p>
+<textarea id=in rows=5 spellcheck=false autocomplete=off placeholder="example.com: ABCDEFGHIJKLMNOPQRSTUVWXYZ234567&#10;AzureDiamond@freenode.net: ABCDEFGHIJKLMNOP&#10;otpauth://totp/geocities.com?secret=QRSTUVWXYZ234567&amp;issuer=geocities.com"></textarea>
+<button id=copy>copy URL to current state WITH SECRETS VISIBLE IN PLAINTEXT</button>
+<progress id=clock max=30 value=0></progress>
+<table id=out></table>
+<script type=module src=app.js></script>
