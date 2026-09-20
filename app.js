@@ -12,8 +12,8 @@ const clip = t => (navigator.clipboard ? navigator.clipboard.writeText(t) : Prom
 const MODES = ['auto', 'light', 'dark'];
 const ICON = { auto: '◐', light: '☀', dark: '☽' };
 function applyTheme(m) {
-  document.documentElement.dataset.theme = m === 'auto' ? '' : m;
   if (m === 'auto') delete document.documentElement.dataset.theme;
+  else document.documentElement.dataset.theme = m;
   $('theme').textContent = ICON[m];
 }
 let mode = localStorage.getItem(THEME) || 'auto';
@@ -24,15 +24,20 @@ $('theme').onclick = () => {
   applyTheme(mode);
 };
 
-// Seed from the URL if present, else restore the last text typed here.
-// "copy" shares everything in #s=... (a fragment, so secrets never reach the
-// server); bare/labelled query params like ?BASE32 also work.
-function fromUrl() {
-  const p = new URLSearchParams(location.hash.slice(1) || location.search);
+// Secrets ride only in the URL fragment (#s=... or #label=secret) so they are
+// never sent to the server. A legacy ?query link is migrated into the fragment
+// and stripped from the address bar -- but note its secret already reached the
+// server on that first request; re-copy the link to get a clean fragment URL.
+function readParams(str) {
+  const p = new URLSearchParams(str);
   if (p.has('s')) return p.get('s');
   return [...p].filter(([k]) => k).map(([k, v]) => (v ? `${k}: ${v}` : k)).join('\n');
 }
-$('in').value = fromUrl() || localStorage.getItem(KEY) || '';
+if (location.search.length > 1) {
+  const text = readParams(location.search.slice(1));
+  history.replaceState(null, '', location.pathname + '#s=' + encodeURIComponent(text));
+}
+$('in').value = readParams(location.hash.slice(1)) || localStorage.getItem(KEY) || '';
 $('in').oninput = () => localStorage.setItem(KEY, $('in').value);
 
 $('copy').onclick = async () => {
